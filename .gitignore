@@ -1,0 +1,34 @@
+# Archivos compilados
+bin/
+obj/
+
+# Archivos de usuario
+*.user
+*.suo
+*.userprefs
+
+# Archivos específicos de Visual Studio
+.vs/
+
+# Publicaciones
+publish/
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+
+# Paquetes
+*.nupkg
+packages/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
