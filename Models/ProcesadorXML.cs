@@ -23,7 +23,7 @@ namespace Proyecto2.Models
             XmlDocument doc = new XmlDocument();
             doc.Load(rutaArchivo); // Carga el archivo en memoria
 
-            // --- 1. LEER DRONES --- [cite: 91, 92, 93]
+            // --- 1. LEER DRONES --- 
             XmlNodeList nodosDrones = doc.SelectNodes("//config/listaDrones/dron");
             if (nodosDrones != null)
             {
@@ -46,7 +46,7 @@ namespace Proyecto2.Models
 
                     SistemaDrones nuevoSistema = new SistemaDrones(nombreSistema, alturaMax, cantDrones);
 
-                    // Leer el contenido de este sistema [cite: 97, 102]
+                    // Leer el contenido de este sistema 
                     XmlNodeList nodosContenido = nodoSistema.SelectNodes("contenido/dron");
                     if (nodosContenido != null)
                     {
@@ -55,7 +55,7 @@ namespace Proyecto2.Models
                             string nombreDronContenido = nodoDronContenido.InnerText.Trim();
                             DronEnSistema nuevoDronEnSistema = new DronEnSistema(nombreDronContenido);
 
-                            // Leer las alturas de este dron [cite: 99, 100, 101]
+                            // Leer las alturas de este dron 
                             XmlNodeList nodosAlturas = nodoDronContenido.NextSibling.SelectNodes("altura");
                             foreach (XmlNode nodoAltura in nodosAlturas)
                             {
@@ -83,7 +83,7 @@ namespace Proyecto2.Models
 
                     Mensaje nuevoMensaje = new Mensaje(nombreMensaje, sistemaAsociado);
 
-                    // Leer instrucciones [cite: 107, 108, 109]
+                    // Leer instrucciones 
                     XmlNodeList nodosInstrucciones = nodoMensaje.SelectNodes("instrucciones/instruccion");
                     if (nodosInstrucciones != null)
                     {
