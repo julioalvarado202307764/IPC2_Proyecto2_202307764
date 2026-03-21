@@ -31,7 +31,7 @@ namespace Proyecto2.Controllers
                 System.IO.File.Delete(rutaTemp);
 
                 // 4. Mandamos un mensaje de éxito a la vista
-                ViewBag.MensajeExito = "¡Archivo XML cargado y procesado correctamente! 🔥";
+                ViewBag.MensajeExito = "¡Archivo XML cargado y procesado correctamente!";
             }
             else
             {

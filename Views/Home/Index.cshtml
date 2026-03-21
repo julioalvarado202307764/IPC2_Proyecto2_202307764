@@ -1,8 +1,32 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Panel de Control";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-4">Sistema de Control de Drones</h1>
+    <p>Ministerio de la Defensa de Guatemala</p>
+</div>
+
+<div class="container mt-4">
+    @if (ViewBag.MensajeExito != null)
+    {
+        <div class="alert alert-success">@ViewBag.MensajeExito</div>
+    }
+    @if (ViewBag.MensajeError != null)
+    {
+        <div class="alert alert-danger">@ViewBag.MensajeError</div>
+    }
+
+    <div class="card shadow-sm p-4">
+        <h3>Cargar Configuración</h3>
+        <p>Selecciona el archivo <code>entrada.xml</code> para configurar los drones, sistemas y mensajes.</p>
+        
+        <form asp-controller="Home" asp-action="CargarArchivo" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input class="form-control" type="file" name="archivoXml" accept=".xml" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cargar Archivo</button>
+            <a asp-controller="Home" asp-action="Inicializar" class="btn btn-warning">Inicializar Sistema</a>
+        </form>
+    </div>
 </div>
