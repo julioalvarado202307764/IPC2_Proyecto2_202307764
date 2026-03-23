@@ -1,0 +1,48 @@
+@model Proyecto2.Models.ListaDrones
+@{
+    ViewData["Title"] = "Listado de Drones";
+    // Iniciamos nuestro puntero en la cabeza de la lista
+    var actual = Model?.Cabeza; 
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">🚁 Listado de Drones</h2>
+
+    <div class="card shadow-sm p-4">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col">Nombre del Dron</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (actual == null)
+                {
+                    <tr>
+                        <td colspan="2" class="text-center text-muted">
+                            No hay drones cargados en el sistema. Sube el archivo XML primero.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int contador = 1;
+                    // Recorremos la memoria dinámica a puro puntero
+                    while (actual != null)
+                    {
+                        <tr>
+                            <td>@contador</td>
+                            <td><span class="badge bg-primary fs-6">@actual.DronInfo.Nombre</span></td>
+                        </tr>
+                        // Avanzamos al siguiente nodo
+                        actual = actual.Siguiente;
+                        contador++;
+                    }
+                }
+            </tbody>
+        </table>
+        
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-3">Volver al Inicio</a>
+    </div>
+</div>

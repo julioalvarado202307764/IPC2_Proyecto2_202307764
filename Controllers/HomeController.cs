@@ -41,13 +41,18 @@ namespace Proyecto2.Controllers
             // Volvemos a mostrar la misma página
             return View("Index");
         }
-        
+
         // Método extra para cumplir con la Inicialización del sistema
         public IActionResult Inicializar()
         {
             DatosGlobales.ReiniciarSistema();
             ViewBag.MensajeExito = "Sistema inicializado en blanco exitosamente.";
             return View("Index");
+        }
+        public IActionResult ListadoDrones()
+        {
+            // Pasamos nuestra ListaDrones directamente a la vista
+            return View(DatosGlobales.SistemaPrincipal.DronesGlobales);
         }
     }
 }

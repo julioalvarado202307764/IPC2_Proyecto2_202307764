@@ -20,13 +20,18 @@
     <div class="card shadow-sm p-4">
         <h3>Cargar Configuración</h3>
         <p>Selecciona el archivo <code>entrada.xml</code> para configurar los drones, sistemas y mensajes.</p>
-        
+
         <form asp-controller="Home" asp-action="CargarArchivo" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <input class="form-control" type="file" name="archivoXml" accept=".xml" required>
             </div>
             <button type="submit" class="btn btn-primary">Cargar Archivo</button>
             <a asp-controller="Home" asp-action="Inicializar" class="btn btn-warning">Inicializar Sistema</a>
+            <hr class="my-4">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a asp-controller="Home" asp-action="ListadoDrones" class="btn btn-info btn-lg">Ver Listado de
+                    Drones</a>
+            </div>
         </form>
     </div>
 </div>
