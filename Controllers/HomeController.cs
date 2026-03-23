@@ -54,5 +54,32 @@ namespace Proyecto2.Controllers
             // Pasamos nuestra ListaDrones directamente a la vista
             return View(DatosGlobales.SistemaPrincipal.DronesGlobales);
         }
+
+        [HttpPost]
+public IActionResult AgregarDron(string nombreDron)
+{
+    // 1. Validar que no manden un texto vacío
+    if (string.IsNullOrWhiteSpace(nombreDron))
+    {
+        TempData["MensajeError"] = "El nombre del dron no puede estar vacío.";
+        return RedirectToAction("ListadoDrones"); // Recargamos la vista
+    }
+
+    // 2. Intentar insertar el dron (recuerda que nuestro método devuelve true/false)
+    bool exito = DatosGlobales.SistemaPrincipal.DronesGlobales.InsertarOrdenado(new Dron(nombreDron.Trim()));
+
+    // 3. Evaluar el resultado
+    if (exito)
+    {
+        TempData["MensajeExito"] = $"¡Dron '{nombreDron}' agregado exitosamente!";
+    }
+    else
+    {
+        TempData["MensajeError"] = $"Error: El dron '{nombreDron}' ya existe en el sistema.";
+    }
+
+    // 4. Volver a cargar la página para ver la tabla actualizada
+    return RedirectToAction("ListadoDrones");
+}
     }
 }
