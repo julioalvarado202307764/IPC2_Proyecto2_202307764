@@ -56,30 +56,40 @@ namespace Proyecto2.Controllers
         }
 
         [HttpPost]
-public IActionResult AgregarDron(string nombreDron)
-{
-    // 1. Validar que no manden un texto vacío
-    if (string.IsNullOrWhiteSpace(nombreDron))
-    {
-        TempData["MensajeError"] = "El nombre del dron no puede estar vacío.";
-        return RedirectToAction("ListadoDrones"); // Recargamos la vista
-    }
+        public IActionResult AgregarDron(string nombreDron)
+        {
+            // 1. Validar que no manden un texto vacío
+            if (string.IsNullOrWhiteSpace(nombreDron))
+            {
+                TempData["MensajeError"] = "El nombre del dron no puede estar vacío.";
+                return RedirectToAction("ListadoDrones"); // Recargamos la vista
+            }
 
-    // 2. Intentar insertar el dron (recuerda que nuestro método devuelve true/false)
-    bool exito = DatosGlobales.SistemaPrincipal.DronesGlobales.InsertarOrdenado(new Dron(nombreDron.Trim()));
+            // 2. Intentar insertar el dron (recuerda que nuestro método devuelve true/false)
+            bool exito = DatosGlobales.SistemaPrincipal.DronesGlobales.InsertarOrdenado(new Dron(nombreDron.Trim()));
 
-    // 3. Evaluar el resultado
-    if (exito)
-    {
-        TempData["MensajeExito"] = $"¡Dron '{nombreDron}' agregado exitosamente!";
-    }
-    else
-    {
-        TempData["MensajeError"] = $"Error: El dron '{nombreDron}' ya existe en el sistema.";
-    }
+            // 3. Evaluar el resultado
+            if (exito)
+            {
+                TempData["MensajeExito"] = $"¡Dron '{nombreDron}' agregado exitosamente!";
+            }
+            else
+            {
+                TempData["MensajeError"] = $"Error: El dron '{nombreDron}' ya existe en el sistema.";
+            }
 
-    // 4. Volver a cargar la página para ver la tabla actualizada
-    return RedirectToAction("ListadoDrones");
-}
+            // 4. Volver a cargar la página para ver la tabla actualizada
+            return RedirectToAction("ListadoDrones");
+        }
+        public IActionResult GraficaSistemas()
+        {
+            // Obtenemos el string con todo el código de Graphviz
+            string codigoDot = DatosGlobales.SistemaPrincipal.SistemasGlobales.GenerarGrafoDOT();
+
+            // Lo guardamos en ViewBag para que la vista lo pueda leer
+            ViewBag.CodigoDot = codigoDot;
+
+            return View();
+        }
     }
 }
