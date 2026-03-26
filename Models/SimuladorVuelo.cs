@@ -2,7 +2,7 @@ using System;
 
 namespace Proyecto2.Models
 {
-    // Clase auxiliar interna para llevar el rastro de cada dron
+    // Clase auxiliar para llevar el rastro matemático de cada dron
     public class EstadoDron
     {
         public string Nombre { get; set; }
@@ -13,53 +13,125 @@ namespace Proyecto2.Models
         public EstadoDron(string nombre)
         {
             Nombre = nombre;
-            AlturaActual = 0; // Todos empiezan en el suelo (0 metros)
-            TiempoDisponible = 0; // Todos están libres en el segundo 0
+            AlturaActual = 0; 
+            TiempoDisponible = 0; 
         }
     }
 
     public class SimuladorVuelo
     {
-        // Este método devuelve el tiempo óptimo total en segundos
+        // 1. MÉTODO PRINCIPAL: Genera la línea de tiempo completa
+        public ListaSegundos GenerarSimulacion(Mensaje mensaje, SistemaDrones sistema)
+        {
+            // Primero, descubrimos cuántos segundos durará en total la simulación
+            int tiempoOptimo = CalcularTiempoOptimo(mensaje, sistema);
+            
+            ListaSegundos lineaDeTiempo = new ListaSegundos();
+
+            // PASO A: Crear la línea de tiempo vacía y llenarla de "Esperar"
+            for (int i = 1; i <= tiempoOptimo; i++)
+            {
+                SegundoSimulado nuevoSegundo = new SegundoSimulado(i);
+                NodoDronSistema actualDron = sistema.Contenido.Cabeza;
+                
+                while (actualDron != null)
+                {
+                    // Por defecto, todos los drones esperan en este segundo
+                    nuevoSegundo.AccionesDrones.Insertar(new AccionDron(actualDron.Datos.NombreDron, "Esperar"));
+                    actualDron = actualDron.Siguiente;
+                }
+                lineaDeTiempo.Insertar(nuevoSegundo);
+            }
+
+            // PASO B: Reescribir la historia con los movimientos reales
+            int tiempoUltimaEmision = 0;
+            EstadoDron cabezaEstados = InicializarEstados(sistema);
+            NodoInstruccion actualInst = mensaje.Instrucciones.Cabeza;
+
+            while (actualInst != null)
+            {
+                string dronObj = actualInst.Datos.NombreDron;
+                int altObj = actualInst.Datos.AlturaObjetivo;
+                EstadoDron estado = BuscarEstado(cabezaEstados, dronObj);
+
+                if (estado != null)
+                {
+                    int tiempoInicio = estado.TiempoDisponible;
+                    int tiempoLlegada = tiempoInicio + Math.Abs(altObj - estado.AlturaActual);
+                    int tiempoEmision = Math.Max(tiempoLlegada, tiempoUltimaEmision) + 1;
+
+                    // Reescribir Fase 1: Movimiento físico (Subir o Bajar)
+                    int tiempoActual = tiempoInicio + 1;
+                    while (tiempoActual <= tiempoLlegada)
+                    {
+                        string accion = (altObj > estado.AlturaActual) ? "Subir" : "Bajar";
+                        ModificarAccion(lineaDeTiempo, tiempoActual, dronObj, accion);
+                        tiempoActual++;
+                    }
+
+                    // Reescribir Fase 2: Emitir Luz
+                    ModificarAccion(lineaDeTiempo, tiempoEmision, dronObj, "Emitir luz");
+
+                    // Actualizar el estado interno del dron
+                    estado.AlturaActual = altObj;
+                    estado.TiempoDisponible = tiempoEmision;
+                    tiempoUltimaEmision = tiempoEmision;
+                }
+                actualInst = actualInst.Siguiente;
+            }
+
+            return lineaDeTiempo;
+        }
+
+        // 2. MÉTODO MATEMÁTICO: Calcula solo el número del tiempo óptimo
         public int CalcularTiempoOptimo(Mensaje mensaje, SistemaDrones sistema)
         {
             int tiempoUltimaEmision = 0;
             EstadoDron cabezaEstados = InicializarEstados(sistema);
-
             NodoInstruccion actualInstruccion = mensaje.Instrucciones.Cabeza;
 
-            // Recorremos cada letra del mensaje que queremos enviar
             while (actualInstruccion != null)
             {
-                string dronObjetivo = actualInstruccion.Datos.NombreDron;
-                int alturaObjetivo = actualInstruccion.Datos.AlturaObjetivo;
-
-                EstadoDron estado = BuscarEstado(cabezaEstados, dronObjetivo);
+                EstadoDron estado = BuscarEstado(cabezaEstados, actualInstruccion.Datos.NombreDron);
                 if (estado != null)
                 {
-                    // 1. ¿Cuánto tiempo le toma moverse físicamente a la altura?
-                    int tiempoMovimiento = Math.Abs(alturaObjetivo - estado.AlturaActual);
+                    int tiempoLlegada = estado.TiempoDisponible + Math.Abs(actualInstruccion.Datos.AlturaObjetivo - estado.AlturaActual);
+                    int tiempoEmisionLuz = Math.Max(tiempoLlegada, tiempoUltimaEmision) + 1;
                     
-                    // 2. ¿En qué segundo está posicionado y listo para brillar?
-                    int tiempoListoParaEmitir = estado.TiempoDisponible + tiempoMovimiento;
-
-                    // 3. Calculamos el segundo exacto en que emitirá luz
-                    // Debe ser cuando esté posicionado Y después de la última luz emitida
-                    int tiempoEmisionLuz = Math.Max(tiempoListoParaEmitir, tiempoUltimaEmision) + 1;
-
-                    // 4. Actualizamos el rastro del dron y del sistema
-                    estado.AlturaActual = alturaObjetivo;
+                    estado.AlturaActual = actualInstruccion.Datos.AlturaObjetivo;
                     estado.TiempoDisponible = tiempoEmisionLuz; 
                     tiempoUltimaEmision = tiempoEmisionLuz;
                 }
-
                 actualInstruccion = actualInstruccion.Siguiente;
             }
-
-            return tiempoUltimaEmision; // Este es el tiempo óptimo final
+            return tiempoUltimaEmision;
         }
 
-        // --- MÉTODOS AUXILIARES (Pura memoria dinámica) ---
+        // --- MÉTODOS AUXILIARES PARA MANEJAR PUNTEROS ---
+        
+        // Busca un segundo específico en la línea de tiempo y cambia la acción de un dron
+        private void ModificarAccion(ListaSegundos linea, int segundoDestino, string nombreDron, string nuevaAccion)
+        {
+            NodoSegundo actualSeg = linea.Cabeza;
+            while (actualSeg != null)
+            {
+                if (actualSeg.Datos.TiempoSegundo == segundoDestino)
+                {
+                    NodoAccion actualAccion = actualSeg.Datos.AccionesDrones.Cabeza;
+                    while (actualAccion != null)
+                    {
+                        if (actualAccion.Datos.NombreDron == nombreDron)
+                        {
+                            actualAccion.Datos.Accion = nuevaAccion;
+                            return; // Encontramos la celda y la cambiamos, salimos rápido
+                        }
+                        actualAccion = actualAccion.Siguiente;
+                    }
+                }
+                actualSeg = actualSeg.Siguiente;
+            }
+        }
+
         private EstadoDron InicializarEstados(SistemaDrones sistema)
         {
             EstadoDron cabeza = null;
