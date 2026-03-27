@@ -92,6 +92,80 @@ namespace Proyecto2.Controllers
             return View();
         }
 
-        
+        // 1. Mostrar el listado general de mensajes
+public IActionResult ListadoMensajes()
+{
+    return View(DatosGlobales.SistemaPrincipal.MensajesGlobales);
+}
+
+// 2. Método auxiliar privado para decodificar el mensaje original a texto
+private string DecodificarMensaje(Mensaje mensaje, SistemaDrones sistema)
+{
+    string textoDecodificado = "";
+    NodoInstruccion actualInst = mensaje.Instrucciones.Cabeza;
+    
+    while (actualInst != null)
+    {
+        NodoDronSistema actualDronSis = sistema.Contenido.Cabeza;
+        while (actualDronSis != null)
+        {
+            if (actualDronSis.Datos.NombreDron == actualInst.Datos.NombreDron)
+            {
+                NodoAltura actualAlt = actualDronSis.Datos.Alturas.Cabeza;
+                while (actualAlt != null)
+                {
+                    if (actualAlt.Datos.ValorAltura == actualInst.Datos.AlturaObjetivo)
+                    {
+                        textoDecodificado += actualAlt.Datos.Letra;
+                        break;
+                    }
+                    actualAlt = actualAlt.Siguiente;
+                }
+                break;
+            }
+            actualDronSis = actualDronSis.Siguiente;
+        }
+        actualInst = actualInst.Siguiente;
+    }
+    return textoDecodificado;
+}
+
+// 3. Generar la simulación detallada de un mensaje específico
+public IActionResult VerInstrucciones(string nombreMensaje)
+{
+    // A. Buscar el mensaje en la memoria dinámica
+    Mensaje msjEncontrado = null;
+    NodoMensaje actualM = DatosGlobales.SistemaPrincipal.MensajesGlobales.Cabeza;
+    while (actualM != null) {
+        if (actualM.Datos.Nombre == nombreMensaje) { msjEncontrado = actualM.Datos; break; }
+        actualM = actualM.Siguiente;
+    }
+
+    if (msjEncontrado == null) return RedirectToAction("ListadoMensajes");
+
+    // B. Buscar el sistema de drones asociado
+    SistemaDrones sisAsociado = null;
+    NodoSistema actualS = DatosGlobales.SistemaPrincipal.SistemasGlobales.Cabeza;
+    while (actualS != null) {
+        if (actualS.Datos.Nombre == msjEncontrado.SistemaDronesRequerido) { sisAsociado = actualS.Datos; break; }
+        actualS = actualS.Siguiente;
+    }
+
+    // C. ¡Usar nuestro super cerebro simulador!
+    SimuladorVuelo simulador = new SimuladorVuelo();
+    int tiempoOptimo = simulador.CalcularTiempoOptimo(msjEncontrado, sisAsociado);
+    ListaSegundos simulacion = simulador.GenerarSimulacion(msjEncontrado, sisAsociado);
+    string textoMensaje = DecodificarMensaje(msjEncontrado, sisAsociado);
+
+    // D. Mandar todo empacado a la vista usando ViewBag
+    ViewBag.NombreMensaje = msjEncontrado.Nombre;
+    ViewBag.NombreSistema = sisAsociado.Nombre;
+    ViewBag.TiempoOptimo = tiempoOptimo;
+    ViewBag.TextoMensaje = textoMensaje;
+    ViewBag.SistemaDrones = sisAsociado; // Lo mandamos para saber las columnas de la tabla
+
+    // Pasamos la línea de tiempo como el modelo principal
+    return View(simulacion);
+}
     }
 }
