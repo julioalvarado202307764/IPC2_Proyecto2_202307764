@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Gráfica de Instrucciones";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📊 Secuencia de Vuelo: <span class="text-primary">@ViewBag.NombreMensaje</span></h2>
+        <a asp-controller="Home" asp-action="VerInstrucciones" asp-route-nombreMensaje="@ViewBag.NombreMensaje" class="btn btn-outline-secondary">Volver a la Tabla</a>
+    </div>
+    
+    <div class="card shadow-sm p-4 text-center">
+        <p class="text-muted">Diagrama de flujo de las acciones segundo a segundo.</p>
+        
+        <div id="graficoGraphviz" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; overflow: auto; background-color: #fafafa;"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
+
+<script>
+    var dotString = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.CodigoDot));
+
+    if (dotString && dotString.trim() !== "") {
+        var viz = new Viz();
+        
+        viz.renderSVGElement(dotString)
+           .then(function(element) {
+               var contenedor = document.getElementById("graficoGraphviz");
+               contenedor.innerHTML = ""; 
+               
+               element.style.maxWidth = "none";
+               element.style.height = "auto";
+               
+               contenedor.appendChild(element);
+           })
+           .catch(error => {
+               console.error("Error dibujando la gráfica:", error);
+               document.getElementById("graficoGraphviz").innerHTML = "<p class='mt-5 text-danger'>Hubo un error al renderizar la gráfica.</p>";
+           });
+    }
+</script>

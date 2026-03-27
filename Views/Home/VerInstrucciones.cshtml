@@ -8,7 +8,12 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2> Simulación: <span class="text-primary">@ViewBag.NombreMensaje</span></h2>
-        <a asp-controller="Home" asp-action="ListadoMensajes" class="btn btn-outline-secondary">Volver a Mensajes</a>
+        <div>
+            <a asp-controller="Home" asp-action="GraficaInstrucciones" asp-route-nombreMensaje="@ViewBag.NombreMensaje"
+                class="btn btn-success me-2">Ver Diagrama Graphviz</a>
+            <a asp-controller="Home" asp-action="ListadoMensajes" class="btn btn-outline-secondary">Volver a
+                Mensajes</a>
+        </div>
     </div>
 
     <div class="row mb-4">
@@ -68,7 +73,7 @@
                                     while (dronFila != null)
                                     {
                                         // Buscamos qué hizo este dron en este segundo
-                                        string accionRealizada = "Esperar"; 
+                                        string accionRealizada = "Esperar";
                                         var accionDron = actualSegundo.Datos.AccionesDrones.Cabeza;
                                         while (accionDron != null)
                                         {
@@ -82,11 +87,11 @@
 
                                         // Colores para que se vea genial
                                         string colorClase = accionRealizada == "Emitir luz" ? "bg-warning fw-bold" :
-                                                            accionRealizada == "Subir" ? "text-primary" :
-                                                            accionRealizada == "Bajar" ? "text-danger" : "text-muted";
+                                        accionRealizada == "Subir" ? "text-primary" :
+                                        accionRealizada == "Bajar" ? "text-danger" : "text-muted";
 
                                         <td class="@colorClase">@accionRealizada</td>
-                                        
+
                                         dronFila = dronFila.Siguiente;
                                     }
                                 }
