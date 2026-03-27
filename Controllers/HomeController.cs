@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Proyecto2.Models;
+using System.Xml;
 
 namespace Proyecto2.Controllers
 {
@@ -93,79 +94,186 @@ namespace Proyecto2.Controllers
         }
 
         // 1. Mostrar el listado general de mensajes
-public IActionResult ListadoMensajes()
-{
-    return View(DatosGlobales.SistemaPrincipal.MensajesGlobales);
-}
-
-// 2. Método auxiliar privado para decodificar el mensaje original a texto
-private string DecodificarMensaje(Mensaje mensaje, SistemaDrones sistema)
-{
-    string textoDecodificado = "";
-    NodoInstruccion actualInst = mensaje.Instrucciones.Cabeza;
-    
-    while (actualInst != null)
-    {
-        NodoDronSistema actualDronSis = sistema.Contenido.Cabeza;
-        while (actualDronSis != null)
+        public IActionResult ListadoMensajes()
         {
-            if (actualDronSis.Datos.NombreDron == actualInst.Datos.NombreDron)
+            return View(DatosGlobales.SistemaPrincipal.MensajesGlobales);
+        }
+
+        // 2. Método auxiliar privado para decodificar el mensaje original a texto
+        private string DecodificarMensaje(Mensaje mensaje, SistemaDrones sistema)
+        {
+            string textoDecodificado = "";
+            NodoInstruccion actualInst = mensaje.Instrucciones.Cabeza;
+
+            while (actualInst != null)
             {
-                NodoAltura actualAlt = actualDronSis.Datos.Alturas.Cabeza;
-                while (actualAlt != null)
+                NodoDronSistema actualDronSis = sistema.Contenido.Cabeza;
+                while (actualDronSis != null)
                 {
-                    if (actualAlt.Datos.ValorAltura == actualInst.Datos.AlturaObjetivo)
+                    if (actualDronSis.Datos.NombreDron == actualInst.Datos.NombreDron)
                     {
-                        textoDecodificado += actualAlt.Datos.Letra;
+                        NodoAltura actualAlt = actualDronSis.Datos.Alturas.Cabeza;
+                        while (actualAlt != null)
+                        {
+                            if (actualAlt.Datos.ValorAltura == actualInst.Datos.AlturaObjetivo)
+                            {
+                                textoDecodificado += actualAlt.Datos.Letra;
+                                break;
+                            }
+                            actualAlt = actualAlt.Siguiente;
+                        }
                         break;
                     }
-                    actualAlt = actualAlt.Siguiente;
+                    actualDronSis = actualDronSis.Siguiente;
                 }
-                break;
+                actualInst = actualInst.Siguiente;
             }
-            actualDronSis = actualDronSis.Siguiente;
+            return textoDecodificado;
         }
-        actualInst = actualInst.Siguiente;
-    }
-    return textoDecodificado;
-}
 
-// 3. Generar la simulación detallada de un mensaje específico
-public IActionResult VerInstrucciones(string nombreMensaje)
-{
-    // A. Buscar el mensaje en la memoria dinámica
-    Mensaje msjEncontrado = null;
-    NodoMensaje actualM = DatosGlobales.SistemaPrincipal.MensajesGlobales.Cabeza;
-    while (actualM != null) {
-        if (actualM.Datos.Nombre == nombreMensaje) { msjEncontrado = actualM.Datos; break; }
-        actualM = actualM.Siguiente;
-    }
+        // 3. Generar la simulación detallada de un mensaje específico
+        public IActionResult VerInstrucciones(string nombreMensaje)
+        {
+            // A. Buscar el mensaje en la memoria dinámica
+            Mensaje msjEncontrado = null;
+            NodoMensaje actualM = DatosGlobales.SistemaPrincipal.MensajesGlobales.Cabeza;
+            while (actualM != null)
+            {
+                if (actualM.Datos.Nombre == nombreMensaje) { msjEncontrado = actualM.Datos; break; }
+                actualM = actualM.Siguiente;
+            }
 
-    if (msjEncontrado == null) return RedirectToAction("ListadoMensajes");
+            if (msjEncontrado == null) return RedirectToAction("ListadoMensajes");
 
-    // B. Buscar el sistema de drones asociado
-    SistemaDrones sisAsociado = null;
-    NodoSistema actualS = DatosGlobales.SistemaPrincipal.SistemasGlobales.Cabeza;
-    while (actualS != null) {
-        if (actualS.Datos.Nombre == msjEncontrado.SistemaDronesRequerido) { sisAsociado = actualS.Datos; break; }
-        actualS = actualS.Siguiente;
-    }
+            // B. Buscar el sistema de drones asociado
+            SistemaDrones sisAsociado = null;
+            NodoSistema actualS = DatosGlobales.SistemaPrincipal.SistemasGlobales.Cabeza;
+            while (actualS != null)
+            {
+                if (actualS.Datos.Nombre == msjEncontrado.SistemaDronesRequerido) { sisAsociado = actualS.Datos; break; }
+                actualS = actualS.Siguiente;
+            }
 
-    // C. ¡Usar nuestro super cerebro simulador!
-    SimuladorVuelo simulador = new SimuladorVuelo();
-    int tiempoOptimo = simulador.CalcularTiempoOptimo(msjEncontrado, sisAsociado);
-    ListaSegundos simulacion = simulador.GenerarSimulacion(msjEncontrado, sisAsociado);
-    string textoMensaje = DecodificarMensaje(msjEncontrado, sisAsociado);
+            // C. ¡Usar nuestro super cerebro simulador!
+            SimuladorVuelo simulador = new SimuladorVuelo();
+            int tiempoOptimo = simulador.CalcularTiempoOptimo(msjEncontrado, sisAsociado);
+            ListaSegundos simulacion = simulador.GenerarSimulacion(msjEncontrado, sisAsociado);
+            string textoMensaje = DecodificarMensaje(msjEncontrado, sisAsociado);
 
-    // D. Mandar todo empacado a la vista usando ViewBag
-    ViewBag.NombreMensaje = msjEncontrado.Nombre;
-    ViewBag.NombreSistema = sisAsociado.Nombre;
-    ViewBag.TiempoOptimo = tiempoOptimo;
-    ViewBag.TextoMensaje = textoMensaje;
-    ViewBag.SistemaDrones = sisAsociado; // Lo mandamos para saber las columnas de la tabla
+            // D. Mandar todo empacado a la vista usando ViewBag
+            ViewBag.NombreMensaje = msjEncontrado.Nombre;
+            ViewBag.NombreSistema = sisAsociado.Nombre;
+            ViewBag.TiempoOptimo = tiempoOptimo;
+            ViewBag.TextoMensaje = textoMensaje;
+            ViewBag.SistemaDrones = sisAsociado; // Lo mandamos para saber las columnas de la tabla
 
-    // Pasamos la línea de tiempo como el modelo principal
-    return View(simulacion);
-}
+            // Pasamos la línea de tiempo como el modelo principal
+            return View(simulacion);
+        }
+        public IActionResult DescargarXML()
+        {
+            // 1. Crear el documento XML desde cero
+            XmlDocument doc = new XmlDocument();
+            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", null, null);
+            doc.AppendChild(xmlDeclaration);
+
+            // Etiqueta Raíz <respuesta>
+            XmlElement raiz = doc.CreateElement("respuesta");
+            doc.AppendChild(raiz);
+
+            // Etiqueta <listaMensajes>
+            XmlElement listaMensajes = doc.CreateElement("listaMensajes");
+            raiz.AppendChild(listaMensajes);
+
+            // 2. Recorrer nuestra memoria dinámica de mensajes
+            NodoMensaje actualM = DatosGlobales.SistemaPrincipal.MensajesGlobales.Cabeza;
+            SimuladorVuelo simulador = new SimuladorVuelo();
+
+            while (actualM != null)
+            {
+                Mensaje msj = actualM.Datos;
+
+                // Buscar el sistema de drones asociado a este mensaje
+                SistemaDrones sis = null;
+                NodoSistema actualS = DatosGlobales.SistemaPrincipal.SistemasGlobales.Cabeza;
+                while (actualS != null)
+                {
+                    if (actualS.Datos.Nombre == msj.SistemaDronesRequerido) { sis = actualS.Datos; break; }
+                    actualS = actualS.Siguiente;
+                }
+
+                if (sis != null)
+                {
+                    // Ejecutar la simulación para obtener los datos
+                    int tiempoOptimo = simulador.CalcularTiempoOptimo(msj, sis);
+                    ListaSegundos lineaTiempo = simulador.GenerarSimulacion(msj, sis);
+                    string msjDecodificado = DecodificarMensaje(msj, sis);
+
+                    // <mensaje nombre="nombreMensaje">
+                    XmlElement nodoMensaje = doc.CreateElement("mensaje");
+                    nodoMensaje.SetAttribute("nombre", msj.Nombre);
+                    listaMensajes.AppendChild(nodoMensaje);
+
+                    // <sistemaDrones>
+                    XmlElement nodoSis = doc.CreateElement("sistemaDrones");
+                    nodoSis.InnerText = sis.Nombre;
+                    nodoMensaje.AppendChild(nodoSis);
+
+                    // <tiempoOptimo>
+                    XmlElement nodoTiempoOp = doc.CreateElement("tiempoOptimo");
+                    nodoTiempoOp.InnerText = tiempoOptimo.ToString();
+                    nodoMensaje.AppendChild(nodoTiempoOp);
+
+                    // <mensajeRecibido>
+                    XmlElement nodoMsjRec = doc.CreateElement("mensajeRecibido");
+                    nodoMsjRec.InnerText = msjDecodificado;
+                    nodoMensaje.AppendChild(nodoMsjRec);
+
+                    // <instrucciones>
+                    XmlElement nodoInstrucciones = doc.CreateElement("instrucciones");
+                    nodoMensaje.AppendChild(nodoInstrucciones);
+
+                    // Recorrer la línea de tiempo segundo a segundo
+                    NodoSegundo actualSeg = lineaTiempo.Cabeza;
+                    while (actualSeg != null)
+                    {
+                        // <tiempo valor="X">
+                        XmlElement nodoTiempo = doc.CreateElement("tiempo");
+                        nodoTiempo.SetAttribute("valor", actualSeg.Datos.TiempoSegundo.ToString());
+                        nodoInstrucciones.AppendChild(nodoTiempo);
+
+                        // <acciones>
+                        XmlElement nodoAcciones = doc.CreateElement("acciones");
+                        nodoTiempo.AppendChild(nodoAcciones);
+
+                        // Recorrer qué hizo cada dron en este segundo
+                        NodoAccion actualAccion = actualSeg.Datos.AccionesDrones.Cabeza;
+                        while (actualAccion != null)
+                        {
+                            // <dron nombre="DronX">Accion</dron>
+                            XmlElement nodoDron = doc.CreateElement("dron");
+                            nodoDron.SetAttribute("nombre", actualAccion.Datos.NombreDron);
+                            nodoDron.InnerText = actualAccion.Datos.Accion;
+                            nodoAcciones.AppendChild(nodoDron);
+
+                            actualAccion = actualAccion.Siguiente;
+                        }
+                        actualSeg = actualSeg.Siguiente;
+                    }
+                }
+                actualM = actualM.Siguiente;
+            }
+
+            // 3. Convertir el XML a un archivo descargable
+            using (MemoryStream ms = new MemoryStream())
+            {
+                doc.Save(ms);
+                byte[] bytes = ms.ToArray();
+                // Esto le dice al navegador "Oye, descarga este archivo, no lo abras"
+                return File(bytes, "application/xml", "salida.xml");
+            }
+        }
+
+
     }
 }
