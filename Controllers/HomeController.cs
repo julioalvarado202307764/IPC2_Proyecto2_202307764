@@ -275,7 +275,7 @@ namespace Proyecto2.Controllers
 
 
         }
-        
+
         public IActionResult GraficaInstrucciones(string nombreMensaje)
         {
             // 1. Buscar el mensaje y el sistema en la memoria (igual que en VerInstrucciones)
@@ -305,6 +305,11 @@ namespace Proyecto2.Controllers
             ViewBag.CodigoDot = simulacion.GenerarGrafoDOT();
             ViewBag.NombreMensaje = nombreMensaje;
 
+            return View();
+        }
+
+        public IActionResult Ayuda()
+        {
             return View();
         }
     }

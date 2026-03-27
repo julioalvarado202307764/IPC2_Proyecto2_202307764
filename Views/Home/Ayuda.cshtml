@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Ayuda y Documentación";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-info mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-info text-white text-center py-3">
+            <h3 class="mb-0"> Información del Sistema</h3>
+        </div>
+        <div class="card-body text-center p-5">
+            <h5 class="text-muted mb-4">Desarrollador</h5>
+            
+            <h2 class="fw-bold text-dark">Julio Alvarado</h2>
+            <h4 class="text-primary mb-4">Carnet: 202307764</h4>
+            
+            <p class="fs-5 text-secondary mb-4">
+                <strong>Curso:</strong> Introducción a la Programación y Computación 2<br>
+                <strong>Universidad:</strong> Universidad de San Carlos de Guatemala
+            </p>
+            
+            <hr class="my-4">
+            
+            <h5 class="text-muted mb-3">Documentación del Proyecto</h5>
+            <p class="small text-secondary mb-4">
+                El repositorio contiene el código fuente, el historial de versiones (releases) y el ensayo técnico del sistema de control de drones.
+            </p>
+            
+            <a href="https://github.com/julioalvarado202307764/IPC2_Proyecto2_202307764" target="_blank" class="btn btn-dark btn-lg w-100 shadow-sm">
+                 Ver Repositorio y Documentación en GitHub
+            </a>
+        </div>
+        <div class="card-footer bg-light text-center py-3">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Volver al Panel Principal</a>
+        </div>
+    </div>
+</div>
