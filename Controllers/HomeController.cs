@@ -272,8 +272,40 @@ namespace Proyecto2.Controllers
                 // Esto le dice al navegador "Oye, descarga este archivo, no lo abras"
                 return File(bytes, "application/xml", "salida.xml");
             }
+
+
         }
+        
+        public IActionResult GraficaInstrucciones(string nombreMensaje)
+        {
+            // 1. Buscar el mensaje y el sistema en la memoria (igual que en VerInstrucciones)
+            Mensaje msjEncontrado = null;
+            NodoMensaje actualM = DatosGlobales.SistemaPrincipal.MensajesGlobales.Cabeza;
+            while (actualM != null)
+            {
+                if (actualM.Datos.Nombre == nombreMensaje) { msjEncontrado = actualM.Datos; break; }
+                actualM = actualM.Siguiente;
+            }
 
+            if (msjEncontrado == null) return RedirectToAction("ListadoMensajes");
 
+            SistemaDrones sisAsociado = null;
+            NodoSistema actualS = DatosGlobales.SistemaPrincipal.SistemasGlobales.Cabeza;
+            while (actualS != null)
+            {
+                if (actualS.Datos.Nombre == msjEncontrado.SistemaDronesRequerido) { sisAsociado = actualS.Datos; break; }
+                actualS = actualS.Siguiente;
+            }
+
+            // 2. Simular para tener la lista de segundos llena
+            SimuladorVuelo simulador = new SimuladorVuelo();
+            ListaSegundos simulacion = simulador.GenerarSimulacion(msjEncontrado, sisAsociado);
+
+            // 3. Generar el código Graphviz y enviarlo a la vista
+            ViewBag.CodigoDot = simulacion.GenerarGrafoDOT();
+            ViewBag.NombreMensaje = nombreMensaje;
+
+            return View();
+        }
     }
 }
