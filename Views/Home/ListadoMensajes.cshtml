@@ -1,0 +1,41 @@
+@model Proyecto2.Models.ListaMensajes
+@{
+    ViewData["Title"] = "Listado de Mensajes";
+    var actual = Model?.Cabeza;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4"> Mensajes Encriptados</h2>
+    <div class="card shadow-sm p-4">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre del Mensaje</th>
+                    <th>Sistema a Utilizar</th>
+                    <th class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (actual == null)
+                {
+                    <tr><td colspan="3" class="text-center">No hay mensajes cargados.</td></tr>
+                }
+                else
+                {
+                    while (actual != null)
+                    {
+                        <tr>
+                            <td class="fw-bold">@actual.Datos.Nombre</td>
+                            <td><span class="badge bg-secondary">@actual.Datos.SistemaDronesRequerido</span></td>
+                            <td class="text-center">
+                                <a asp-controller="Home" asp-action="VerInstrucciones" asp-route-nombreMensaje="@actual.Datos.Nombre" class="btn btn-primary btn-sm">Ver Instrucciones y Simular</a>
+                            </td>
+                        </tr>
+                        actual = actual.Siguiente;
+                    }
+                }
+            </tbody>
+        </table>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-3" style="width: 200px;">Volver al Inicio</a>
+    </div>
+</div>
