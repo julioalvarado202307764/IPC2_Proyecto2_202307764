@@ -1,0 +1,101 @@
+@model Proyecto2.Models.ListaSegundos
+@{
+    ViewData["Title"] = "Simulación de Mensaje";
+    var actualSegundo = Model?.Cabeza;
+    var sistema = ViewBag.SistemaDrones as Proyecto2.Models.SistemaDrones;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2> Simulación: <span class="text-primary">@ViewBag.NombreMensaje</span></h2>
+        <a asp-controller="Home" asp-action="ListadoMensajes" class="btn btn-outline-secondary">Volver a Mensajes</a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-light border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Tiempo Óptimo</h5>
+                    <h2 class="text-success fw-bold">@ViewBag.TiempoOptimo Segundos</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Mensaje Decodificado</h5>
+                    <h2 class="text-info fw-bold">"@ViewBag.TextoMensaje"</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light border-secondary shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Sistema Utilizado</h5>
+                    <h2 class="text-secondary fw-bold">@ViewBag.NombreSistema</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-3">Despliegue de Instrucciones</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 100px;">Tiempo (s)</th>
+                        @{
+                            // Dibujamos las cabeceras con los nombres de los drones
+                            var dronCol = sistema?.Contenido.Cabeza;
+                            while (dronCol != null)
+                            {
+                                <th>@dronCol.Datos.NombreDron</th>
+                                dronCol = dronCol.Siguiente;
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        while (actualSegundo != null)
+                        {
+                            <tr>
+                                <td class="fw-bold bg-light">@actualSegundo.Datos.TiempoSegundo</td>
+                                @{
+                                    // Recorremos los drones en el mismo orden de las cabeceras
+                                    var dronFila = sistema?.Contenido.Cabeza;
+                                    while (dronFila != null)
+                                    {
+                                        // Buscamos qué hizo este dron en este segundo
+                                        string accionRealizada = "Esperar"; 
+                                        var accionDron = actualSegundo.Datos.AccionesDrones.Cabeza;
+                                        while (accionDron != null)
+                                        {
+                                            if (accionDron.Datos.NombreDron == dronFila.Datos.NombreDron)
+                                            {
+                                                accionRealizada = accionDron.Datos.Accion;
+                                                break;
+                                            }
+                                            accionDron = accionDron.Siguiente;
+                                        }
+
+                                        // Colores para que se vea genial
+                                        string colorClase = accionRealizada == "Emitir luz" ? "bg-warning fw-bold" :
+                                                            accionRealizada == "Subir" ? "text-primary" :
+                                                            accionRealizada == "Bajar" ? "text-danger" : "text-muted";
+
+                                        <td class="@colorClase">@accionRealizada</td>
+                                        
+                                        dronFila = dronFila.Siguiente;
+                                    }
+                                }
+                            </tr>
+                            actualSegundo = actualSegundo.Siguiente;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
