@@ -12,6 +12,12 @@ namespace Proyecto2.Controllers
         {
             return View();
         }
+        // Este método simplemente muestra la nueva vista web
+        [HttpGet]
+        public IActionResult CargarArchivo()
+        {
+            return View();
+        }
 
         [HttpPost] // Indica que este método recibe datos de un formulario
         public IActionResult CargarArchivo(IFormFile archivoXml)

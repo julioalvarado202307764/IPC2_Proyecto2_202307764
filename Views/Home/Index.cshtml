@@ -2,43 +2,68 @@
     ViewData["Title"] = "Panel de Control";
 }
 
-<div class="text-center mt-5">
-    <h1 class="display-4">Sistema de Control de Drones</h1>
-    <p>Ministerio de la Defensa de Guatemala</p>
-</div>
+<div class="container mt-4 text-center">
+    <h1 class="display-4 fw-bolder text-dark mb-3"> Sistema de Control de Drones</h1>
+    <p class="lead text-muted mb-5">Centro de mando y simulación táctica. Seleccione una operación.</p>
 
-<div class="container mt-4">
-    @if (ViewBag.MensajeExito != null)
+    @if (TempData["MensajeExito"] != null)
     {
-        <div class="alert alert-success">@ViewBag.MensajeExito</div>
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mx-auto" style="max-width: 600px;" role="alert">
+            <strong>¡Éxito!</strong> @TempData["MensajeExito"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
-    @if (ViewBag.MensajeError != null)
+    @if (TempData["MensajeError"] != null)
     {
-        <div class="alert alert-danger">@ViewBag.MensajeError</div>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mx-auto" style="max-width: 600px;" role="alert">
+            <strong>Error:</strong> @TempData["MensajeError"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
 
-    <div class="card shadow-sm p-4">
-        <h3>Cargar Configuración</h3>
-        <p>Selecciona el archivo <code>entrada.xml</code> para configurar los drones, sistemas y mensajes.</p>
+    <div class="row justify-content-center g-4 mt-2">
+        
+        <div class="col-md-5 col-lg-4">
+            <a asp-controller="Home" asp-action="CargarArchivo" class="btn btn-primary btn-lg w-100 py-4 shadow fw-bold fs-5">
+                 1. Cargar Archivo XML
+            </a>
+        </div>
+        
+        <div class="col-md-5 col-lg-4">
+            <a asp-controller="Home" asp-action="Inicializar" class="btn btn-danger btn-lg w-100 py-4 shadow fw-bold fs-5" onclick="return confirm('¿Está seguro que desea borrar toda la memoria del sistema?');">
+                 Inicializar Sistema
+            </a>
+        </div>
 
-        <form asp-controller="Home" asp-action="CargarArchivo" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <input class="form-control" type="file" name="archivoXml" accept=".xml" required />
-            </div>
-            <button type="submit" class="btn btn-primary">Cargar Archivo</button>
-            <a asp-controller="Home" asp-action="Inicializar" class="btn btn-warning">Inicializar Sistema</a>
-            <hr class="my-4">
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <a asp-controller="Home" asp-action="ListadoDrones" class="btn btn-info btn-lg">Ver Listado de Drones</a>
-            </div>
-            <div class="d-grid gap-2 col-6 mx-auto mt-2"></div>
-            <a asp-controller="Home" asp-action="GraficaSistemas" class="btn btn-success btn-lg">Ver Gráfica de Sistemas</a>
-            <a asp-controller="Home" asp-action="ListadoMensajes" class="btn btn-primary btn-lg">Gestión de Mensajes</a>
-            <a asp-controller="Home" asp-action="DescargarXML" class="btn btn-outline-dark btn-lg mt-3">Generar y
-                Descargar salida.xml</a>
-            <a asp-controller="Home" asp-action="Ayuda" class="btn btn-secondary btn-lg mt-3">Ayuda e Información</a>
-        </form>
+        <div class="col-md-5 col-lg-4">
+            <a asp-controller="Home" asp-action="ListadoDrones" class="btn btn-info btn-lg w-100 py-4 shadow text-white fw-bold fs-5">
+                 Gestión de Drones
+            </a>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <a asp-controller="Home" asp-action="GraficaSistemas" class="btn btn-success btn-lg w-100 py-4 shadow fw-bold fs-5">
+                 Gráfica de Sistemas
+            </a>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <a asp-controller="Home" asp-action="ListadoMensajes" class="btn btn-warning btn-lg w-100 py-4 shadow fw-bold fs-5 text-dark">
+                 Gestión de Mensajes
+            </a>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <a asp-controller="Home" asp-action="DescargarXML" class="btn btn-dark btn-lg w-100 py-4 shadow fw-bold fs-5">
+                 Descargar Salida XML
+            </a>
+        </div>
+
+        <div class="col-md-5 col-lg-4 mt-5 mx-auto">
+            <a asp-controller="Home" asp-action="Ayuda" class="btn btn-outline-secondary btn-lg w-100 py-3 shadow-sm fw-bold">
+                 Ayuda e Información
+            </a>
+        </div>
+
     </div>
-
-</div>
 </div>

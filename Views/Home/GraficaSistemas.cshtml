@@ -3,7 +3,7 @@
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">📊 Gráfica de Sistemas de Drones</h2>
+    <h2 class="mb-4"> Gráfica de Sistemas de Drones</h2>
     
     <div class="card shadow-sm p-4 text-center">
         <p class="text-muted">Desplázate y haz zoom sobre el gráfico para ver los detalles.</p>
@@ -30,10 +30,6 @@
                var contenedor = document.getElementById("graficoGraphviz");
                contenedor.innerHTML = ""; 
                
-               // ¡AQUÍ ESTÁ LA MAGIA! 
-               // Borramos las líneas que aplastaban el SVG.
-               // Ahora dejamos que se dibuje a su tamaño real y 
-               // le decimos que se centre en la pantalla.
                element.style.maxWidth = "none";
                element.style.height = "auto";
                

@@ -1,41 +1,74 @@
 @model Proyecto2.Models.ListaMensajes
 @{
-    ViewData["Title"] = "Listado de Mensajes";
+    ViewData["Title"] = "Gestión de Mensajes";
     var actual = Model?.Cabeza;
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4"> Mensajes Encriptados</h2>
-    <div class="card shadow-sm p-4">
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Nombre del Mensaje</th>
-                    <th>Sistema a Utilizar</th>
-                    <th class="text-center">Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (actual == null)
-                {
-                    <tr><td colspan="3" class="text-center">No hay mensajes cargados.</td></tr>
-                }
-                else
-                {
-                    while (actual != null)
-                    {
-                        <tr>
-                            <td class="fw-bold">@actual.Datos.Nombre</td>
-                            <td><span class="badge bg-secondary">@actual.Datos.SistemaDronesRequerido</span></td>
-                            <td class="text-center">
-                                <a asp-controller="Home" asp-action="VerInstrucciones" asp-route-nombreMensaje="@actual.Datos.Nombre" class="btn btn-primary btn-sm">Ver Instrucciones y Simular</a>
-                            </td>
-                        </tr>
-                        actual = actual.Siguiente;
-                    }
-                }
-            </tbody>
-        </table>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-3" style="width: 200px;">Volver al Inicio</a>
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="display-6 fw-bolder text-dark"> Interceptación de Mensajes</h2>
+        <p class="text-muted fs-5">Desencriptación y cálculo de tiempo óptimo de vuelo</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Bandeja de Entrada Encriptada</h5>
+                    <span class="badge bg-dark rounded-pill fs-6">Requiere Simulación</span>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="px-4 py-3 text-secondary">Identificador del Mensaje</th>
+                                    <th class="py-3 text-secondary">Sistema Requerido</th>
+                                    <th class="py-3 text-center text-secondary">Acción Táctica</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (actual == null)
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-5">
+                                            <i class="fs-1">📡</i><br>
+                                            No hay mensajes interceptados.<br>Cargue un archivo XML para poblar la bandeja.
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    while (actual != null)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3 fw-bold text-dark fs-5">
+                                                <i class="text-warning me-2"></i> @actual.Datos.Nombre
+                                            </td>
+                                            <td class="py-3">
+                                                <span class="badge border border-secondary text-secondary px-3 py-2 fs-6">
+                                                    @actual.Datos.SistemaDronesRequerido
+                                                </span>
+                                            </td>
+                                            <td class="text-center py-3">
+                                                <a asp-controller="Home" asp-action="VerInstrucciones" asp-route-nombreMensaje="@actual.Datos.Nombre" class="btn btn-outline-primary btn-sm px-4 fw-bold rounded-pill shadow-sm">
+                                                     Iniciar Simulación
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        actual = actual.Siguiente;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-dark btn-lg px-5 shadow-sm">Volver al Panel Principal</a>
+            </div>
+        </div>
     </div>
 </div>

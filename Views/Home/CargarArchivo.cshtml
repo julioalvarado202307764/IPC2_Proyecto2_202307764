@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Cargar Archivo XML";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header bg-primary text-white text-center py-4 rounded-top">
+                    <h3 class="mb-0 fw-bold"> Subir Configuración</h3>
+                </div>
+                <div class="card-body p-5 bg-light text-center">
+                    <p class="text-muted mb-4 fs-5">Seleccione el archivo XML con los sistemas y mensajes de los drones.</p>
+                    
+                    <form asp-controller="Home" asp-action="CargarArchivo" method="post" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <input class="form-control form-control-lg border-primary shadow-sm" type="file" name="archivoXml" accept=".xml" required />
+                        </div>
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm">
+                                Procesar Archivo XML
+                            </button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                Volver al Panel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
