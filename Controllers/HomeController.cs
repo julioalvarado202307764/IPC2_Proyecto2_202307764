@@ -313,6 +313,128 @@ namespace Proyecto2.Controllers
 
             return View();
         }
+        //CAMBIOS EXAMEN FINAL PROYECTO 2
+        // --- 1. MÉTODO AYUDANTE PARA INVERTIR EL TEXTO ---
+        // Lo ponemos "private" porque solo lo usaremos aquí adentro
+        private string InvertirCadenaManual(string original)
+        {
+            string invertida = "";
+            for (int i = original.Length - 1; i >= 0; i--)
+            {
+                invertida += original[i];
+            }
+            return invertida;
+        }
+
+        // --- 2. MÉTODO AYUDANTE PARA INVERTIR LA LISTA DE INSTRUCCIONES ---
+        // Lo ponemos "private" también
+        // --- 2. MÉTODO AYUDANTE PARA INVERTIR LA LISTA DE INSTRUCCIONES ---
+        private ListaInstrucciones InvertirInstruccionesManual(ListaInstrucciones original)
+        {
+            ListaInstrucciones listaInvertida = new ListaInstrucciones();
+            var actual = original.Cabeza; // 'actual' es un NodoInstruccion
+
+            while (actual != null)
+            {
+                // 1. Extraemos los datos usando actual.Datos
+                string nombre = actual.Datos.NombreDron;
+                int altura = actual.Datos.AlturaObjetivo;
+
+                // 2. Creamos la nueva instrucción usando tu constructor
+                Instruccion nuevaInstruccion = new Instruccion(nombre, altura);
+
+                // 3. Empaquetamos la instrucción en un nuevo Nodo
+                NodoInstruccion nuevoNodo = new NodoInstruccion();
+                nuevoNodo.Datos = nuevaInstruccion;
+                nuevoNodo.Siguiente = null;
+
+                // 4. LÓGICA DE INSERCIÓN AL INICIO (Esto invierte la lista)
+                if (listaInvertida.Cabeza == null)
+                {
+                    listaInvertida.Cabeza = nuevoNodo;
+                }
+                else
+                {
+                    nuevoNodo.Siguiente = listaInvertida.Cabeza;
+                    listaInvertida.Cabeza = nuevoNodo;
+                }
+
+                // 5. Avanzamos al siguiente nodo de la lista original
+                actual = actual.Siguiente;
+            }
+
+            return listaInvertida;
+        }
+
+        // --- MÉTODO AYUDANTE PARA BUSCAR EL MENSAJE EN TU LISTA GLOBAL ---
+        // --- MÉTODO AYUDANTE PARA BUSCAR EL MENSAJE ---
+        // --- MÉTODO AYUDANTE PARA BUSCAR EL MENSAJE ---
+        private Mensaje BuscarMensajePorNombre(string nombreMensaje)
+        {
+            // Ahora usamos MensajesGlobales que es el nombre correcto
+            var actual = DatosGlobales.SistemaPrincipal.MensajesGlobales.Cabeza;
+
+            while (actual != null)
+            {
+                if (actual.Datos.Nombre == nombreMensaje)
+                {
+                    return actual.Datos;
+                }
+                actual = actual.Siguiente;
+            }
+            return null;
+        }
+
+        // buscar el sistema
+        private SistemaDrones BuscarSistemaPorNombre(string nombreSistema)
+        {
+            // Ahora usamos SistemasGlobales que es el nombre correcto
+            var actual = DatosGlobales.SistemaPrincipal.SistemasGlobales.Cabeza;
+
+            while (actual != null)
+            {
+                if (actual.Datos.Nombre == nombreSistema)
+                {
+                    return actual.Datos;
+                }
+                actual = actual.Siguiente;
+            }
+            return null;
+        }
+        // boton inverso
+        public IActionResult SimularModoInverso(string nombreMensaje)
+        {
+            // Busca el mensaje original
+            Mensaje mensajeOriginal = BuscarMensajePorNombre(nombreMensaje);
+
+            if (mensajeOriginal == null)
+            {
+                TempData["MensajeError"] = "Mensaje no encontrado.";
+                return RedirectToAction("ListadoMensajes"); // Asegúrate de que esta sea la vista correcta
+            }
+
+            //  el nombre invertido primero
+            string nombreInvertido = InvertirCadenaManual(mensajeOriginal.Nombre);
+            string sistemaRequerido = mensajeOriginal.SistemaDronesRequerido; // Si te da error de nombre aquí, revisa cómo le llamaste a esta propiedad en tu clase Mensaje (ej. SistemaAsociado)
+
+            // Usamos tu constructor exacto (el que vimos en ProcesadorXML)
+            Mensaje mensajeInvertido = new Mensaje(nombreInvertido, sistemaRequerido);
+
+            // Invertimos las instrucciones
+            mensajeInvertido.Instrucciones = InvertirInstruccionesManual(mensajeOriginal.Instrucciones);
+
+            // Busca el sistema y simula
+            SistemaDrones sistema = BuscarSistemaPorNombre(sistemaRequerido);
+            SimuladorVuelo simulador = new SimuladorVuelo();
+
+            int tiempoOptimo = simulador.CalcularTiempoOptimo(mensajeInvertido, sistema);
+            var lineaDeTiempo = simulador.GenerarSimulacion(mensajeInvertido, sistema);
+
+            ViewBag.TiempoOptimo = tiempoOptimo;
+            ViewBag.NombreMensaje = mensajeInvertido.Nombre;
+            DatosGlobales.SistemaPrincipal.MensajesGlobales.InsertarOrdenado(mensajeInvertido);
+            return View("VerInstrucciones", lineaDeTiempo);
+        }
 
         public IActionResult Ayuda()
         {

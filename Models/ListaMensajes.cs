@@ -25,7 +25,7 @@ namespace Proyecto2.Models
 
             // Buscar su lugar
             NodoMensaje actual = Cabeza;
-            while (actual.Siguiente != null && 
+            while (actual.Siguiente != null &&
                    string.Compare(nuevoMensaje.Nombre, actual.Siguiente.Datos.Nombre, StringComparison.OrdinalIgnoreCase) > 0)
             {
                 actual = actual.Siguiente;
@@ -34,5 +34,7 @@ namespace Proyecto2.Models
             nuevoNodo.Siguiente = actual.Siguiente;
             actual.Siguiente = nuevoNodo;
         }
+        
+        
     }
 }
